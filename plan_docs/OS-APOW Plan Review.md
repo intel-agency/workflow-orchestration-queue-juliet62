@@ -121,7 +121,7 @@ The sentinel defines `WorkItem` with `id, issue_number, source_url, context_body
 
 > **Remarks:**
 >
-> **NM:** Add such a file and import/use in the respective files so that the dev team follows that strategy.
+> _[Your feedback here]_
 
 ---
 
@@ -135,7 +135,7 @@ The sentinel does label-remove → label-add → post comment as separate API ca
 
 > **Remarks:**
 >
-> **NM:** Add directions to plans
+> _[Your feedback here]_
 
 ---
 
@@ -149,7 +149,7 @@ The plan specifies "jittered exponential backoff" for rate limiting (Development
 
 > **Remarks:**
 >
-> **NM:** Add directions to plans
+> _[Your feedback here]_
 
 ---
 
@@ -163,7 +163,7 @@ Both `fetch_queued_tasks()` and `claim_task()` create a new `async with httpx.As
 
 > **Remarks:**
 >
-> **NM:** Add to plans
+> _[Your feedback here]_
 
 ---
 
@@ -177,7 +177,7 @@ Both `fetch_queued_tasks()` and `claim_task()` create a new `async with httpx.As
 
 > **Remarks:**
 >
-> **NM:** Add directions to plans
+> _[Your feedback here]_
 
 ---
 
@@ -191,7 +191,7 @@ The plan specifies "post a Heartbeat comment every 5 minutes for tasks exceeding
 
 > **Remarks:**
 >
-> **NM:** Add directions to plans
+> _[Your feedback here]_
 
 ---
 
@@ -205,7 +205,7 @@ Story 6 specifies monitoring a `credits_used` file and auto-stalling on budget e
 
 > **Remarks:**
 >
-> **NM:** Add directions to plans but make a note to not include in first veriosn. I want to cut down on complexity as much as possible.
+> _[Your feedback here]_
 
 ---
 
@@ -219,7 +219,7 @@ Story 6 specifies monitoring a `credits_used` file and auto-stalling on budget e
 
 > **Remarks:**
 >
-> **NM:** Add directions to plans. Make the changes.
+> _[Your feedback here]_
 
 ---
 
@@ -233,7 +233,7 @@ The label deletion in `claim_task()` has `except: pass` which silently swallows 
 
 > **Remarks:**
 >
-> **NM:** Fix.
+> _[Your feedback here]_
 
 ---
 
@@ -246,7 +246,8 @@ The Implementation Spec says the sentinel should issue `docker-compose down -v &
 **Recommendation:** Add a teardown step after `process_task()` completes (or before the next task starts). At minimum call `devcontainer-opencode.sh stop` between tasks; for full isolation, use `down`.
 
 > **Remarks:**
->**NM:** Add directions to plans. Make the changes. Make a flag in settings or env var or arguments or both/multiple.
+>
+> _[Your feedback here]_
 
 ---
 
@@ -262,7 +263,7 @@ This is critical given observed 15+ minute subagent delegation times that produc
 
 > **Remarks:**
 >
->**NM:** Add directions to plans. Make the changes.
+> _[Your feedback here]_
 
 ---
 
@@ -274,7 +275,7 @@ Use the assign-then-verify pattern: (1) attempt to assign the sentinel's bot acc
 
 > **Remarks:**
 >
-> **NM:** Add explicit directions to plans. Make the changes.
+> _[Your feedback here]_
 
 ---
 
@@ -286,7 +287,7 @@ Put `WorkItem`, `TaskType`, `WorkItemStatus` in a single shared `src/models/work
 
 > **Remarks:**
 >
-> **NM:** Add changes to the example code. Make the changes. This was covered in an I task I believe.
+> _[Your feedback here]_
 
 ---
 
@@ -298,7 +299,7 @@ The sentinel catches `KeyboardInterrupt` but doesn't handle `SIGTERM`, which is 
 
 > **Remarks:**
 >
-**NM:** Add explicit directions to plans. Make the changes.
+> _[Your feedback here]_
 
 ---
 
@@ -310,7 +311,7 @@ Create `httpx.AsyncClient` once in `GitHubQueue.__init__()` and reuse it across 
 
 > **Remarks:**
 >
-> **NM:** Add explicit directions to plans. Make the changes.
+> _[Your feedback here]_
 
 ---
 
@@ -322,19 +323,19 @@ The sentinel validates env vars at startup — the notifier doesn't. Add a start
 
 > **Remarks:**
 >
-> **NM:** Add explicit directions to plans. Make the changes.
+> _[Your feedback here]_
 
 ---
 
 ### R-7: Implement Credential Scrubber for Public Logs
 
-The plan describes a regex-based "Scrubber" for sanitizing worker output before posting to GitHub comments. This is specced in both the Architecture Guide and Implementation Spec but has no implementation. At minimum, strip patterns matching `ghp_`, `ghs_`, `Bearer`, and common API key formats before posting any worker output to issues.
+The plan describes a regex-based "Scrubber" for sanitizing worker output before posting to GitHub comments. This is specced in both the Architecture Guide and Implementation Spec but has no implementation. At minimum, strip patterns matching `ghp_`, `ghs_`, `Bearer `, and common API key formats before posting any worker output to issues.
 
 **Ref:** Architecture Guide v3, §5 "Credential Scrubbing & Audit Trail"; Implementation Spec v1, §Logging "Public Telemetry"
 
 > **Remarks:**
-
-> **NM:** Add explicit directions to plans. Make the changes. _[Your feedback here]_
+>
+> _[Your feedback here]_
 
 ---
 
@@ -346,7 +347,7 @@ The sentinel's `run_shell_command()` uses `asyncio.create_subprocess_exec` with 
 
 > **Remarks:**
 >
-> **NM:** Add explicit directions to plans. Make the changes.
+> _[Your feedback here]_
 
 ---
 

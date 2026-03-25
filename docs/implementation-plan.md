@@ -2,7 +2,7 @@
 
 > **Source:** `docs/workflow-issues-and-fixes.md` (with owner remarks applied 2026-03-21)
 >
-> **Scope:** Template repo `ai-new-workflow-app-template` only. Issues targeting generated code (sentinel, notifier, queue) are deferred to the implementation phase.
+> **Scope:** Template repo `workflow-orchestration-queue-juliet62` only. Issues targeting generated code (sentinel, notifier, queue) are deferred to the implementation phase.
 
 ---
 

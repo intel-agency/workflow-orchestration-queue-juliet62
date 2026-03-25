@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OS-APOW Architecture & Development Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.1); }
+        .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; border-radius: 4px; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        const App = () => {
+            const [activeTab, setActiveTab] = useState('overview');
+
+            const renderContent = () => {
+                switch(activeTab) {
+                    case 'overview':
+                        return <Overview />;
+                    case 'architecture':
+                        return <Architecture />;
+                    case 'plan':
+                        return <DevelopmentPlan />;
+                    case 'tech':
+                        return <TechStack />;
+                    default:
+                        return <Overview />;
+                }
+            };
+
+            return (
+                <div className="min-h-screen flex flex-col">
+                    <nav className="glass-panel sticky top-0 z-50 px-6 py-4 flex justify-between items-center shadow-lg">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                                <i data-lucide="bot" className="text-white w-6 h-6"></i>
+                            </div>
+                            <div>
+                                <h1 className="text-xl font-bold tracking-tight text-white">OS-APOW</h1>
+                                <p className="text-xs text-slate-400">Opencode-Server Agent Workflow</p>
+                            </div>
+                        </div>
+                        <div className="flex gap-2 bg-slate-800/50 p-1 rounded-lg border border-slate-700">
+                            {['overview', 'architecture', 'plan', 'tech'].map(tab => (
+                                <button
+                                    key={tab}
+                                    onClick={() => setActiveTab(tab)}
+                                    className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 capitalize ${activeTab === tab ? 'bg-indigo-500 text-white shadow-md' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-700/50'}`}
+                                >
+                                    {tab}
+                                </button>
+                            ))}
+                        </div>
+                    </nav>
+
+                    <main className="flex-grow p-8 max-w-7xl mx-auto w-full">
+                        <div className="animate-fade-in">
+                            {renderContent()}
+                        </div>
+                    </main>
+
+                    <footer className="border-t border-slate-800 text-center py-6 text-slate-500 text-sm mt-auto">
+                        <p>OS-APOW Application Implementation Specification &copy; 2026</p>
+                    </footer>
+                </div>
+            );
+        };
+
+        const Overview = () => (
+            <div className="space-y-8 animate-fade-in">
+                <div className="glass-panel p-8 rounded-2xl shadow-xl border-l-4 border-l-indigo-500">
+                    <h2 className="text-3xl font-bold mb-4">Executive Summary</h2>
+                    <p className="text-slate-300 leading-relaxed text-lg mb-6">
+                        OS-APOW represents a paradigm shift from <strong>Interactive AI Coding</strong> to <strong>Headless Agentic Orchestration</strong>.
+                        It transforms standard project management artifacts (GitHub Issues) into "Execution Orders" that are autonomously fulfilled by specialized AI agents via reproducible DevContainers.
+                    </p>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+                        <FeatureCard icon="zap" title="Zero-Touch" desc="Issues flow directly to Pull Requests without human prompts." />
+                        <FeatureCard icon="shield" title="Reproducible" desc="Agents use identical DevContainer environments as humans." />
+                        <FeatureCard icon="database" title="Markdown State" desc="State and logs live entirely in GitHub for perfect auditability." />
+                    </div>
+                </div>
+
+                <div className="glass-panel p-8 rounded-2xl">
+                    <h3 className="text-xl font-semibold mb-6 flex items-center gap-2"><i data-lucide="target" className="text-indigo-400 w-5 h-5"></i> Guiding Principles</h3>
+                    <ul className="space-y-4">
+                        <li className="flex gap-4 items-start bg-slate-800/30 p-4 rounded-lg border border-slate-700/50">
+                            <div className="bg-emerald-500/20 p-2 rounded-md text-emerald-400 mt-1"><i data-lucide="code-2" className="w-4 h-4"></i></div>
+                            <div>
+                                <strong className="block text-white mb-1">Script-First Integration ("The Bridge")</strong>
+                                <span className="text-slate-400 text-sm">System utilizes existing devcontainer shell scripts rather than reimplementing Docker SDK logic, ensuring absolute parity with local development environments.</span>
+                            </div>
+                        </li>
+                        <li className="flex gap-4 items-start bg-slate-800/30 p-4 rounded-lg border border-slate-700/50">
+                            <div className="bg-blue-500/20 p-2 rounded-md text-blue-400 mt-1"><i data-lucide="eye" className="w-4 h-4"></i></div>
+                            <div>
+                                <strong className="block text-white mb-1">State Visibility & Transparency</strong>
+                                <span className="text-slate-400 text-sm">Distributed state relies on GitHub Issues, Labels, and Comments. This allows real-time human intervention if the agent strays.</span>
+                            </div>
+                        </li>
+                        <li className="flex gap-4 items-start bg-slate-800/30 p-4 rounded-lg border border-slate-700/50">
+                            <div className="bg-purple-500/20 p-2 rounded-md text-purple-400 mt-1"><i data-lucide="refresh-cw" className="w-4 h-4"></i></div>
+                            <div>
+                                <strong className="block text-white mb-1">Resiliency through Polling</strong>
+                                <span className="text-slate-400 text-sm">While webhooks offer speed, a persistent polling backbone ensures the system self-heals and resumes work seamlessly after server restarts.</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        );
+
+        const Architecture = () => (
+            <div className="space-y-8">
+                <h2 className="text-3xl font-bold mb-6">System Architecture</h2>
+
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <ArchNode
+                        title="The Ear (Notifier)"
+                        icon="webhook"
+                        color="pink"
+                        stack="Python, FastAPI, Pydantic"
+                        desc="Ingests webhooks, validates HMAC SHA256 signatures to prevent injection, and triages tasks into standardized WorkItem manifests."
+                    />
+                    <ArchNode
+                        title="The Logic State (Queue)"
+                        icon="list-todo"
+                        color="blue"
+                        stack="GitHub Issues, Labels"
+                        desc="Markdown-as-a-Database. Uses Assignees as a distributed locking semaphore. Maintains states like agent:queued and agent:in-progress."
+                    />
+                    <ArchNode
+                        title="The Brain (Sentinel)"
+                        icon="cpu"
+                        color="indigo"
+                        stack="Python Async, HTTPX"
+                        desc="Polls the queue, claims tickets, syncs auth, and commands the worker via the shell bridge. Manages lifecycle and captures logs."
+                    />
+                    <ArchNode
+                        title="The Hands (Worker)"
+                        icon="terminal"
+                        color="emerald"
+                        stack="Docker, Opencode, LLM"
+                        desc="Isolated DevContainer executing task workflows against the codebase. Builds indices, runs tests, and creates PRs."
+                    />
+                </div>
+
+                <div className="glass-panel p-8 rounded-2xl mt-8">
+                    <h3 className="text-xl font-semibold mb-6 flex items-center gap-2"><i data-lucide="shield-check" className="text-indigo-400 w-5 h-5"></i> Security & Isolation</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700">
+                            <h4 className="font-semibold text-white mb-2">Network Isolation</h4>
+                            <p className="text-slate-400 text-sm">Workers operate in a dedicated Docker network without access to host subnets.</p>
+                        </div>
+                        <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700">
+                            <h4 className="font-semibold text-white mb-2">Ephemeral Credentials</h4>
+                            <p className="text-slate-400 text-sm">Installation tokens are injected temporarily and destroyed on container exit.</p>
+                        </div>
+                        <div className="bg-slate-800/50 p-5 rounded-xl border border-slate-700">
+                            <h4 className="font-semibold text-white mb-2">Log Scrubbing</h4>
+                            <p className="text-slate-400 text-sm">Regex-based scrubbers ensure tokens are never leaked into GitHub UI comments.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+
+        const DevelopmentPlan = () => (
+            <div className="space-y-6">
+                <h2 className="text-3xl font-bold mb-6">Phased Development Plan</h2>
+                <div className="space-y-4">
+                    <PhaseCard
+                        number="0"
+                        title="Seeding & Bootstrapping"
+                        status="Done"
+                        details={[
+                            "Manual cloning of workflow-orchestration-queue-juliet62.",
+                            "Seed plan documents into the /docs directory.",
+                            "Execution of orchestrate-dynamic-workflow command for project setup."
+                        ]}
+                    />
+                    <PhaseCard
+                        number="1"
+                        title="The Sentinel (MVP)"
+                        status="Active"
+                        details={[
+                            "Create standard IWorkQueue interface to prevent vendor lock-in.",
+                            "Build the Resilient Polling Engine querying GitHub REST API.",
+                            "Implement the Shell-Bridge Dispatcher using devcontainer-opencode.sh.",
+                            "Add unique instance tracking and LLM budget cost guardrails."
+                        ]}
+                    />
+                    <PhaseCard
+                        number="2"
+                        title="The Ear (Webhook Automation)"
+                        status="Upcoming"
+                        details={[
+                            "Develop hardened FastAPI Webhook receiver with HMAC validation.",
+                            "Implement Intelligent Template Triaging for issues.",
+                            "Establish local-to-cloud tunneling (e.g. ngrok) for dev mode."
+                        ]}
+                    />
+                    <PhaseCard
+                        number="3"
+                        title="Deep Orchestration (Planning)"
+                        status="Upcoming"
+                        details={[
+                            "Create Architect Sub-Agent to decompose Application Plans into Epics.",
+                            "Build autonomous bug correction loops triggered by PR Review Comments.",
+                            "Implement proactive remote workspace vector indexing."
+                        ]}
+                    />
+                </div>
+            </div>
+        );
+
+        const TechStack = () => (
+            <div className="space-y-8">
+                <h2 className="text-3xl font-bold mb-6">Core Technologies</h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div className="glass-panel p-6 rounded-2xl">
+                        <h3 className="text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2">Python Ecosystem</h3>
+                        <ul className="space-y-3">
+                            <TechItem name="Python 3.12" desc="Base language for Notifier and Sentinel logic." />
+                            <TechItem name="FastAPI & Uvicorn" desc="High-performance async web framework for the webhook listener." />
+                            <TechItem name="Pydantic" desc="Strict data modeling and payload validation." />
+                            <TechItem name="HTTPX" desc="Async HTTP client for non-blocking GitHub API interaction." />
+                            <TechItem name="uv" desc="High-speed Rust-based package installer and resolver." />
+                        </ul>
+                    </div>
+
+                    <div className="glass-panel p-6 rounded-2xl">
+                        <h3 className="text-lg font-bold text-white mb-4 border-b border-slate-700 pb-2">Infrastructure & Tooling</h3>
+                        <ul className="space-y-3">
+                            <TechItem name="Docker & DevContainers" desc="Core isolation and reproducible execution engine." />
+                            <TechItem name="PowerShell Core (pwsh)" desc="Cross-platform scripting for the shell bridge and auth." />
+                            <TechItem name="GitHub Issues & API" desc="Used strictly as the application database and task queue." />
+                            <TechItem name="Opencode-Server" desc="The LLM execution environment driving the worker container." />
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        );
+
+        // --- Helper Components ---
+
+        const FeatureCard = ({ icon, title, desc }) => (
+            <div className="bg-slate-800/50 p-6 rounded-xl border border-slate-700 hover:border-indigo-500/50 transition-colors">
+                <div className="bg-indigo-500/10 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
+                    <i data-lucide={icon} className="text-indigo-400 w-6 h-6"></i>
+                </div>
+                <h4 className="text-lg font-bold text-white mb-2">{title}</h4>
+                <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+            </div>
+        );
+
+        const ArchNode = ({ title, icon, color, stack, desc }) => {
+            const colors = {
+                pink: 'from-pink-500/20 to-pink-600/5 text-pink-400 border-pink-500/30',
+                blue: 'from-blue-500/20 to-blue-600/5 text-blue-400 border-blue-500/30',
+                indigo: 'from-indigo-500/20 to-indigo-600/5 text-indigo-400 border-indigo-500/30',
+                emerald: 'from-emerald-500/20 to-emerald-600/5 text-emerald-400 border-emerald-500/30',
+            };
+            return (
+                <div className={`bg-gradient-to-br ${colors[color]} border p-6 rounded-2xl flex flex-col h-full`}>
+                    <div className="flex items-center justify-between mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="bg-black/20 p-2 rounded-lg"><i data-lucide={icon} className="w-5 h-5"></i></div>
+                            <h3 className="text-xl font-bold text-white">{title}</h3>
+                        </div>
+                        <span className="text-xs font-mono bg-black/30 px-2 py-1 rounded text-slate-300">{stack}</span>
+                    </div>
+                    <p className="text-slate-300 text-sm leading-relaxed flex-grow">{desc}</p>
+                </div>
+            );
+        };
+
+        const PhaseCard = ({ number, title, status, details }) => {
+            const [expanded, setExpanded] = useState(number === "1");
+            return (
+                <div className="glass-panel border border-slate-700 rounded-xl overflow-hidden transition-all duration-300">
+                    <div
+                        className="p-5 flex items-center justify-between cursor-pointer hover:bg-slate-800/50"
+                        onClick={() => setExpanded(!expanded)}
+                    >
+                        <div className="flex items-center gap-4">
+                            <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm ${status === 'Done' ? 'bg-emerald-500/20 text-emerald-400' : status === 'Active' ? 'bg-indigo-500 text-white' : 'bg-slate-700 text-slate-400'}`}>
+                                {number}
+                            </div>
+                            <h3 className="text-lg font-semibold text-white">{title}</h3>
+                        </div>
+                        <div className="flex items-center gap-4">
+                            <span className={`text-xs px-2 py-1 rounded-full ${status === 'Done' ? 'bg-emerald-500/20 text-emerald-400' : status === 'Active' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-slate-700 text-slate-400'}`}>
+                                {status}
+                            </span>
+                            <i data-lucide={expanded ? 'chevron-up' : 'chevron-down'} className="text-slate-400 w-5 h-5"></i>
+                        </div>
+                    </div>
+                    {expanded && (
+                        <div className="p-5 pt-0 border-t border-slate-700/50 bg-slate-900/30">
+                            <ul className="space-y-2 mt-4 ml-2">
+                                {details.map((detail, idx) => (
+                                    <li key={idx} className="flex gap-3 text-slate-300 text-sm">
+                                        <i data-lucide="check-circle-2" className="text-indigo-400 w-4 h-4 flex-shrink-0 mt-0.5"></i>
+                                        <span>{detail}</span>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
+                </div>
+            );
+        };
+
+        const TechItem = ({ name, desc }) => (
+            <li className="flex flex-col">
+                <span className="text-white font-medium text-sm">{name}</span>
+                <span className="text-slate-400 text-xs">{desc}</span>
+            </li>
+        );
+
+        // Initialize Lucide icons
+        setTimeout(() => {
+            if (window.lucide) {
+                window.lucide.createIcons();
+            }
+        }, 100);
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

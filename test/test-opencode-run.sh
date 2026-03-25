@@ -11,7 +11,7 @@ DEVCONTAINER_CONFIG="$REPO_ROOT/.devcontainer/devcontainer.json"
 PROMPT_TEMPLATE="$REPO_ROOT/.github/workflows/prompts/orchestrator-agent-prompt.md"
 FIXTURE_FILE="$REPO_ROOT/test/fixtures/issues-opened.json"
 LOCAL_PROMPT_FILE="$REPO_ROOT/.tmp-opencode-validation-prompt.md"
-CONTAINER_PROMPT_FILE="/workspaces/ai-new-workflow-app-template/.tmp-opencode-validation-prompt.md"
+CONTAINER_PROMPT_FILE="/workspaces/workflow-orchestration-queue-juliet62/.tmp-opencode-validation-prompt.md"
 
 RUN_STAMP="$(date -u +%Y%m%dT%H%M%SZ)"
 LOG_DIR="/tmp/opencode-run-${RUN_STAMP}"

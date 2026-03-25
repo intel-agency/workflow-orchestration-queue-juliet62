@@ -77,7 +77,7 @@ The existing `pr-approval-and-merge.md` already has robust coverage for comment 
 ## Phase 3: Update Orchestrator Prompt — 4-Step Loop
 
 **Locations to update:**
-- The orchestrator prompt template in `ai-new-workflow-app-template` (e.g., `prompt.ps1`, `orchestrator-supervisor.md`, or the assembled prompt).
+- The orchestrator prompt template in `workflow-orchestration-queue-juliet62` (e.g., `prompt.ps1`, `orchestrator-supervisor.md`, or the assembled prompt).
 - Any references to the sequence in `ai-new-app-template.md` or `.github/ISSUE_TEMPLATE/application-plan.md`.
 
 ### Changes to make
@@ -143,4 +143,4 @@ The existing `continuous-improvement.md` assignment is a strong candidate for a 
 | `ai-workflow-assignments/dynamic-workflows/implement-epic.md` | agent-instructions | Hard stop at PR creation |
 | `ai-workflow-assignments/report-progress.md` | agent-instructions | Add deviation/findings guidance |
 | `ai-workflow-assignments/debrief-and-document.md` | agent-instructions | Add ACTION ITEM flagging guidance |
-| Orchestrator prompt (TBD exact file) | ai-new-workflow-app-template | Define 4-step loop |
+| Orchestrator prompt (TBD exact file) | workflow-orchestration-queue-juliet62 | Define 4-step loop |
