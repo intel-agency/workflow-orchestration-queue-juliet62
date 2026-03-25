@@ -1,0 +1,123 @@
+name: validate
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# validate ALL changes/dont skip any revisions, even if a newer one is pushed
+# concurrency:
+#   group: ${{ github.workflow }}-${{ github.ref }}
+#   cancel-in-progress: true    
+
+jobs:
+  lint:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Install dev tools
+        shell: pwsh
+        run: ./scripts/install-dev-tools.ps1
+
+      - name: Lint
+        shell: pwsh
+        run: ./scripts/validate.ps1 -Lint
+
+  scan:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        with:
+          fetch-depth: 0
+
+      - name: Install dev tools
+        shell: pwsh
+        run: ./scripts/install-dev-tools.ps1
+
+      - name: Scan for secrets
+        shell: pwsh
+        run: ./scripts/validate.ps1 -Scan
+
+  test:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Install dev tools
+        shell: pwsh
+        run: ./scripts/install-dev-tools.ps1
+
+      - name: Run tests
+        shell: pwsh
+        run: ./scripts/validate.ps1 -Test
+
+      - name: Upload Pester results
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pester-test-results
+          path: test-results-pester.xml
+          if-no-files-found: ignore
+
+  test-devcontainer-build:
+    needs: lint
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull and clean devcontainer image metadata
+        run: |
+          IMAGE="ghcr.io/${{ github.repository }}/devcontainer:main-latest"
+          docker pull "$IMAGE" || true
+          # If prebuilt image is not available yet, build a local fallback image
+          # so devcontainers/ci can still run smoke tests on this commit.
+          if ! docker image inspect "$IMAGE" > /dev/null 2>&1; then
+            docker build \
+              -f .github/.devcontainer/Dockerfile \
+              -t "$IMAGE" \
+              .github/.devcontainer
+          fi
+          # Strip stale devcontainer.metadata label from cached prebuild
+          if docker image inspect "$IMAGE" > /dev/null 2>&1; then
+            echo "FROM $IMAGE" | docker build --label devcontainer.metadata='[]' -t "$IMAGE" -
+          fi
+          # Ensure the image referenced by .devcontainer/devcontainer.json is
+          # available locally (handles fresh template clones whose devcontainer
+          # config still points at the template repo's prebuilt image).
+          DC_IMAGE=$(jq -r '.image // empty' .devcontainer/devcontainer.json)
+          if [ -n "$DC_IMAGE" ] && [ "$DC_IMAGE" != "$IMAGE" ]; then
+            if ! docker image inspect "$DC_IMAGE" > /dev/null 2>&1; then
+              docker tag "$IMAGE" "$DC_IMAGE"
+            fi
+          fi
+
+      - name: Build devcontainer and run smoke tests
+        uses: devcontainers/ci@8bf61b26e9c3a98f69cb6ce2f88d24ff59b785c6 # v0.3
+        with:
+          imageName: ghcr.io/${{ github.repository }}/devcontainer
+          cacheFrom: ghcr.io/${{ github.repository }}/devcontainer
+          push: never
+          runCmd: bash test/test-devcontainer-tools.sh

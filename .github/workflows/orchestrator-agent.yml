@@ -1,0 +1,254 @@
+name: orchestrator-agent
+
+on:
+  issues:
+    types: [opened, labeled] #, edited, reopened, assigned]
+  #issue_comment:
+  #  types: [created, edited]
+  workflow_run:
+    types: [completed]
+    workflows: ["Pre-build dev container image"]
+  # pull_request_review_comment:
+  #   types: [created, edited]
+  # pull_request_review:
+  #   types: [submitted, edited]
+  # pull_request:
+  #   types: [opened, synchronize, reopened]
+  workflow_dispatch:
+    inputs:
+      prompt:
+        description: "Custom prompt to send to the orchestrator (bypasses event assembly)"
+        required: false
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  skip-event:
+    # Explicitly ignored event conditions. Add new skip cases to the `if` below.
+    # When this job runs, its step outputs the event details and explains the skip.
+    # Skip cases:
+    #   1. traycerai[bot] actor — avoid feedback loops
+    #   2. labeled events for non-workflow labels — only implementation:ready
+    #      and implementation:complete should trigger the orchestrator
+    runs-on: ubuntu-24.04
+    if: >-
+      github.actor == 'traycerai[bot]' ||
+      (github.event_name == 'issues' &&
+       github.event.action == 'labeled' &&
+       github.event.label.name != 'implementation:ready' &&
+       github.event.label.name != 'implementation:complete')
+    steps:
+      - name: Report skipped event
+        run: |
+          echo "::notice::Orchestrator skipped — event explicitly ignored"
+          echo "Event:  ${{ github.event_name }}"
+          echo "Action: ${{ github.event.action }}"
+          echo "Actor:  ${{ github.actor }}"
+          echo "Label:  ${{ github.event.label.name || 'N/A' }}"
+          echo "Repo:   ${{ github.repository }}"
+          echo "Ref:    ${{ github.ref }}"
+          if [ "${{ github.actor }}" = "traycerai[bot]" ]; then
+            echo "Reason: Actor 'traycerai[bot]' is in the skip list"
+          else
+            echo "Reason: Label '${{ github.event.label.name }}' is not a workflow-relevant label"
+          fi
+
+  orchestrate:
+    runs-on: ubuntu-24.04
+    if: >-
+      github.actor != 'traycerai[bot]' &&
+      (github.event_name != 'issues' ||
+       github.event.action != 'labeled' ||
+       github.event.label.name == 'implementation:ready' ||
+       github.event.label.name == 'implementation:complete') &&
+      (github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success')
+    permissions:
+      id-token: write
+      contents: write
+      pull-requests: write
+      issues: write
+      packages: read
+      repository-projects: write
+    env:
+      # Secrets must be available at job level so they're present during
+      # 'devcontainer up' — the postStartCommand launches the opencode server
+      # daemon, which reads API keys from remoteEn`v (${localEnv:...}).
+      # Setting them only on a later step leaves the server without auth.
+      ZHIPU_API_KEY: ${{ secrets.ZHIPU_API_KEY }}
+      KIMI_CODE_ORCHESTRATOR_AGENT_API_KEY: ${{ secrets.KIMI_CODE_ORCHESTRATOR_AGENT_API_KEY }}
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_ORCHESTRATION_AGENT_TOKEN: ${{ secrets.GH_ORCHESTRATION_AGENT_TOKEN }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Assemble orchestrator prompt
+        shell: bash
+        env:
+          EVENT_JSON: ${{ toJson(github.event) }}
+          CUSTOM_PROMPT: ${{ inputs.prompt }}
+        run: |
+          bash ./scripts/assemble-orchestrator-prompt.sh \
+            "${{ github.event_name }}" \
+            "${{ github.event.action }}" \
+            "${{ github.actor }}" \
+            "${{ github.repository }}" \
+            "${{ github.ref }}" \
+            "${{ github.sha }}"
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify devcontainer image exists
+        run: |
+          IMAGE="ghcr.io/${{ github.repository }}/devcontainer:main-latest"
+          if ! docker manifest inspect "$IMAGE" > /dev/null 2>&1; then
+            echo "::error::Devcontainer image not found: $IMAGE"
+            echo "::error::Run the 'Publish Docker' and 'Pre-build dev container image' workflows first."
+            exit 1
+          fi
+
+      - name: Pull devcontainer image
+        run: docker pull "ghcr.io/${{ github.repository }}/devcontainer:main-latest"
+        # Docker automatically skips pulling layers that are already cached on
+        # the runner. The image tag is stable (main-latest), so repeated runs
+        # on warm runners benefit from the layer cache without extra config.
+
+      - name: Cache devcontainer CLI
+        uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4
+        with:
+          path: ~/.npm-global
+          key: devcontainer-cli-${{ runner.os }}-0.84.1
+
+      - name: Install devcontainer CLI
+        run: |
+          npm config set prefix ~/.npm-global
+          if ! command -v devcontainer &>/dev/null; then
+            npm install -g @devcontainers/cli@0.84.1
+          fi
+          echo "$HOME/.npm-global/bin" >> "$GITHUB_PATH"
+
+      - name: Start devcontainer
+        run: bash ./scripts/devcontainer-opencode.sh up
+
+      - name: Ensure opencode server is running in devcontainer
+        run: bash ./scripts/devcontainer-opencode.sh start
+
+      - name: Dump assembled prompt
+        if: vars.DEBUG_ORCHESTRATOR == 'true'
+        run: |
+          echo "::group::Full assembled prompt ($ORCHESTRATOR_PROMPT_PATH)"
+          echo "Path: $ORCHESTRATOR_PROMPT_PATH"
+          echo "Exists: $(test -f "$ORCHESTRATOR_PROMPT_PATH" && echo YES || echo NO)"
+          echo "Size: $(wc -c < "$ORCHESTRATOR_PROMPT_PATH") bytes, $(wc -l < "$ORCHESTRATOR_PROMPT_PATH") lines"
+          echo "---"
+          cat "$ORCHESTRATOR_PROMPT_PATH"
+          echo "---"
+          echo "::endgroup::"
+
+      - name: Verify prompt is accessible inside devcontainer
+        if: vars.DEBUG_ORCHESTRATOR == 'true'
+        run: |
+          echo "Checking if assembled prompt is visible inside devcontainer..."
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -c "
+              echo 'Inside devcontainer:';
+              echo '  PWD='\$(pwd);
+              echo '  File: $ORCHESTRATOR_PROMPT_PATH';
+              if [ -f '$ORCHESTRATOR_PROMPT_PATH' ]; then
+                echo '  EXISTS: YES';
+                echo '  Size:' \$(wc -c < '$ORCHESTRATOR_PROMPT_PATH') 'bytes,' \$(wc -l < '$ORCHESTRATOR_PROMPT_PATH') 'lines';                
+              else
+                echo '  EXISTS: NO — prompt file not found inside devcontainer!';
+                echo '  Listing workspace root:';
+                ls -la;
+              fi
+            "
+
+      - name: Execute orchestrator agent in devcontainer
+        env:
+          DEBUG_ORCHESTRATOR: ${{ vars.DEBUG_ORCHESTRATOR }}
+        run: |
+          echo "::notice::Executing orchestrator agent with prompt: $ORCHESTRATOR_PROMPT_PATH"
+          echo "Prompt file size: $(wc -c < "$ORCHESTRATOR_PROMPT_PATH") bytes"
+          echo "devcontainer-opencode.sh prompt -f $ORCHESTRATOR_PROMPT_PATH"
+          echo "---"
+          bash ./scripts/devcontainer-opencode.sh prompt -f "$ORCHESTRATOR_PROMPT_PATH"
+          EXIT_CODE=$?
+          echo "---"
+          echo "::notice::devcontainer-opencode.sh exited with code: $EXIT_CODE"
+          exit $EXIT_CODE
+
+      - name: Dump server-side logs from devcontainer
+        if: always() && vars.DEBUG_ORCHESTRATOR == 'true'
+        run: |
+          echo "::group::opencode serve log (server-side)"
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -c "
+              echo '=== /tmp/opencode-serve.log ===';
+              if [ -f /tmp/opencode-serve.log ]; then
+                echo 'Size:' \$(wc -c < /tmp/opencode-serve.log) 'bytes,' \$(wc -l < /tmp/opencode-serve.log) 'lines';
+                cat /tmp/opencode-serve.log;
+              else
+                echo 'NOT FOUND';
+              fi;
+              echo '';
+              echo '=== opencode data directory ===';
+              ls -laR ~/.local/share/opencode/ 2>/dev/null | head -50 || echo 'no opencode data dir';
+              echo '';
+              echo '=== latest session logs ===';
+              find ~/.local/share/opencode/ -name '*.log' -newer /tmp/opencode-serve.log 2>/dev/null | while read f; do
+                echo \"--- \$f ---\";
+                tail -100 \"\$f\";
+              done;
+              echo '';
+              echo '=== opencode session list ===';
+              opencode session list --format json 2>&1 | head -50 || echo 'session list failed';
+            "
+          echo "::endgroup::"
+
+      - name: Collect trace artifacts from devcontainer
+        if: always()
+        run: |
+          mkdir -p /tmp/trace-artifacts
+          # Copy rotating log files out of the devcontainer
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -c "
+              mkdir -p /tmp/trace-bundle;
+              cp ~/.local/share/opencode/log/*.log /tmp/trace-bundle/ 2>/dev/null || true;
+              cp /tmp/opencode-serve.log /tmp/trace-bundle/opencode-serve.log 2>/dev/null || true;
+              python3 scripts/trace-extract.py --scrub > /tmp/trace-bundle/subagent-traces.txt 2>&1 || true;
+            "
+          # Pull files from the container to the runner
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -c "cat /tmp/trace-bundle/subagent-traces.txt" > /tmp/trace-artifacts/subagent-traces.txt 2>/dev/null || true
+          devcontainer exec \
+            --workspace-folder . \
+            --config .devcontainer/devcontainer.json \
+            -- bash -c "tar -cf - -C /tmp/trace-bundle ." | tar -xf - -C /tmp/trace-artifacts/ 2>/dev/null || true
+          echo "Trace artifacts collected: $(find /tmp/trace-artifacts/ -maxdepth 1 -type f 2>/dev/null | wc -l) files"
+
+      - name: Upload trace artifacts
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: opencode-traces
+          path: /tmp/trace-artifacts/
+          retention-days: 14
+          if-no-files-found: ignore

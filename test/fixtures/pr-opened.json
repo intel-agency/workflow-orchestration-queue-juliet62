@@ -1,0 +1,35 @@
+{
+  "action": "opened",
+  "number": 1,
+  "pull_request": {
+    "number": 1,
+    "title": "feat: add devcontainer prebuild",
+    "body": "Adds devcontainer infrastructure with prebuilt image pushed to ghcr.io.\n\n## Changes\n- `.devcontainer/Dockerfile` with all tooling\n- `.devcontainer/devcontainer.json` config\n- Prebuild workflow",
+    "state": "open",
+    "draft": false,
+    "merged": false,
+    "head": {
+      "ref": "feat/devcontainer",
+      "sha": "abc123def456"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "def456abc789"
+    },
+    "user": { "login": "nam20485" },
+    "labels": [],
+    "assignees": [],
+    "requested_reviewers": [],
+    "changed_files": 3,
+    "additions": 85,
+    "deletions": 0,
+    "html_url": "https://github.com/intel-agency/workflow-orchestration/pull/1",
+    "diff_url": "https://github.com/intel-agency/workflow-orchestration/pull/1.diff"
+  },
+  "repository": {
+    "full_name": "intel-agency/workflow-orchestration",
+    "name": "workflow-orchestration",
+    "owner": { "login": "intel-agency" }
+  },
+  "sender": { "login": "nam20485" }
+}

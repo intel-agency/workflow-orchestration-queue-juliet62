@@ -1,0 +1,35 @@
+{
+  "tools": {
+    "autoAccept": "false"
+  },
+  "context": {
+    "fileName": "QWEN.md"
+  },
+  "mcpServers": {
+    "sequential-thinking": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-sequential-thinking"],
+      "version": "0.0.1"
+    },
+    "memory": {
+      "type": "stdio",
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-memory"],
+      "version": "0.0.1"
+    },
+    "microsoft-docs": {
+      "url": "https://learn.microsoft.com/api/mcp",
+      "type": "http"
+    }
+  },
+  "general": {
+    "preferredEditor": "vscode-insiders"
+  },
+  "ui": {
+    "theme": "Default"
+  },
+  "disabledTools": ["web_fetch"],
+  "inputs": [],
+  "$version": 3
+}

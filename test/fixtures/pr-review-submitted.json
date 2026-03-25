@@ -1,0 +1,33 @@
+{
+  "action": "submitted",
+  "review": {
+    "id": 300,
+    "body": "Looks good overall but the Dockerfile could use some layer optimization.",
+    "state": "changes_requested",
+    "user": { "login": "reviewer" },
+    "html_url": "https://github.com/intel-agency/workflow-orchestration/pull/1#pullrequestreview-300",
+    "submitted_at": "2026-02-17T03:00:00Z",
+    "commit_id": "abc123def456"
+  },
+  "pull_request": {
+    "number": 1,
+    "title": "feat: add devcontainer prebuild",
+    "state": "open",
+    "head": {
+      "ref": "feat/devcontainer",
+      "sha": "abc123def456"
+    },
+    "base": {
+      "ref": "main",
+      "sha": "def456abc789"
+    },
+    "user": { "login": "nam20485" },
+    "html_url": "https://github.com/intel-agency/workflow-orchestration/pull/1"
+  },
+  "repository": {
+    "full_name": "intel-agency/workflow-orchestration",
+    "name": "workflow-orchestration",
+    "owner": { "login": "intel-agency" }
+  },
+  "sender": { "login": "reviewer" }
+}

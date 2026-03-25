@@ -1,0 +1,28 @@
+{
+  "action": "created",
+  "comment": {
+    "id": 200,
+    "body": "LGTM, but could you add a test for the edge case?",
+    "user": { "login": "reviewer" },
+    "html_url": "https://github.com/intel-agency/workflow-orchestration/pull/1#issuecomment-200",
+    "created_at": "2026-02-17T02:00:00Z",
+    "updated_at": "2026-02-17T02:00:00Z"
+  },
+  "issue": {
+    "number": 1,
+    "title": "feat: add devcontainer prebuild",
+    "state": "open",
+    "user": { "login": "nam20485" },
+    "pull_request": {
+      "url": "https://api.github.com/repos/intel-agency/workflow-orchestration/pulls/1",
+      "html_url": "https://github.com/intel-agency/workflow-orchestration/pull/1"
+    },
+    "html_url": "https://github.com/intel-agency/workflow-orchestration/pull/1"
+  },
+  "repository": {
+    "full_name": "intel-agency/workflow-orchestration",
+    "name": "workflow-orchestration",
+    "owner": { "login": "intel-agency" }
+  },
+  "sender": { "login": "reviewer" }
+}

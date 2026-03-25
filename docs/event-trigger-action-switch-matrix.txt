@@ -1,0 +1,11 @@
+Event                           (Label)                                                                      Action
+New Repo                        (? idenify a new `ai-new-app-tempate`-cloned
+                                repo with `./plan_docs` dir)                                                orchestrate-project-setup with(in                                                                           that repo
+
+New Regular (!sub/child) Issue  new-app-plan    orchestrate-new-app-plan                                    orchestarate single workflow                                                                                                    create-epic
+
+New PR Created
+
+PR Merged
+
+New Regular Issue               epic-plan                                              orchestrate next epic, orchestrate implement epic

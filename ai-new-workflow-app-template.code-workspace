@@ -1,0 +1,19 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"chat.tools.terminal.autoApprove": {
+			"gh": true
+		},
+		"github-actions.workflows.pinned.workflows": [
+			".github/workflows/orchestrator-agent.yml",
+			".github/workflows/publish-docker.yml",
+			".github/workflows/prebuild-devcontainer.yml"
+		],
+		"python.analysis.typeCheckingMode": "off",
+		"markdown.validate.enabled": true
+	}
+}

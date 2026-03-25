@@ -1,0 +1,30 @@
+{
+  // Heading increment — agent files use h4 under h2 intentionally
+  "MD001": false,
+  // Heading style — mixed styles across agent/template files
+  "MD003": false,
+  // Multiple blank lines — common in structured documents
+  "MD012": false,
+  // Line length — too strict for prose and templates
+  "MD013": false,
+  // Blanks around headings — conflicts with compact XML-structured instruction files
+  "MD022": false,
+  // Duplicate headings — agent files reuse section names like "Deliverables"
+  "MD024": false,
+  // Multiple top-level headings — command/template files use multiple h1s
+  "MD025": false,
+  // Blanks inside blockquote — issue templates use spaced blockquotes
+  "MD028": false,
+  // Blanks around lists — conflicts with compact template formatting
+  "MD032": false,
+  // Inline HTML — required for XML-structured instruction files
+  "MD033": false,
+  // Emphasis as heading — prompt files use bold for section markers
+  "MD036": false,
+  // Fenced code language — many code blocks are generic placeholders
+  "MD040": false,
+  // First line heading — frontmatter and templates don't start with headings
+  "MD041": false,
+  // Link/image reference definitions — false positives in instruction files
+  "MD060": false
+}

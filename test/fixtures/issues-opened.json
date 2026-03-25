@@ -1,0 +1,22 @@
+{
+  "action": "opened",
+  "issue": {
+    "number": 42,
+    "title": "Test: Validate orchestrator agent triage",
+    "body": "This is a test issue to verify the orchestrator workflow triggers correctly on issue creation.",
+    "state": "open",
+    "user": { "login": "nam20485", "id": 12345 },
+    "labels": [],
+    "assignees": [],
+    "milestone": null,
+    "html_url": "https://github.com/intel-agency/workflow-orchestration/issues/42",
+    "created_at": "2026-02-17T00:00:00Z",
+    "updated_at": "2026-02-17T00:00:00Z"
+  },
+  "repository": {
+    "full_name": "intel-agency/workflow-orchestration",
+    "name": "workflow-orchestration",
+    "owner": { "login": "intel-agency" }
+  },
+  "sender": { "login": "nam20485" }
+}

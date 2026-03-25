@@ -1,0 +1,84 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "instructions": [
+    "AGENTS.md"
+  ],
+  "provider": {
+    "zai-coding-plan": {
+      "models": {
+        "glm-5": {
+          "name": "GLM-5",
+          "limit": {
+            "context": 200000,
+            "output": 131072
+          }
+        },
+        "glm-4.5-x": {
+          "name": "GLM-4.5-X",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          }
+        },
+        "glm-4.5-air-x": {
+          "name": "GLM-4.5-Air-X",
+          "limit": {
+            "context": 128000,
+            "output": 16384
+          }
+        },
+        "glm-4.7": {
+          "name": "GLM-4.7",
+          "limit": {
+            "context": 200000,
+            "output": 131072
+          }
+        },
+        "glm-4.7-flash": {
+          "name": "GLM-4.7-Flash",
+          "limit": {
+            "context": 200000,
+            "output": 131072
+          }
+        },
+        "glm-4.7-flashx": {
+          "name": "GLM-4.7-FlashX",
+          "limit": {
+            "context": 200000,
+            "output": 131072
+          }
+        }
+      }
+    }   
+  },
+  "model": "zai-coding-plan/glm-5",
+  "small_model": "zai-coding-plan/glm-4.5-air-x",
+  "permission": {
+    "external_directory": {
+      "/tmp/*": "allow"
+    }
+  },
+  "mcp": {
+    "sequential-thinking": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-sequential-thinking"]
+    },
+    "memory": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-memory"]
+    },
+    "github": {
+      "type": "local",
+      "command": ["npx", "-y", "@modelcontextprotocol/server-github"],
+      "environment": {
+        "GITHUB_PERSONAL_ACCESS_TOKEN": "${GITHUB_TOKEN}"
+      },
+      "enabled": false
+    },
+    "gh_grep": {
+      "type": "remote",
+      "url": "https://mcp.grep.app",
+      "enabled": false
+    }
+  }
+}

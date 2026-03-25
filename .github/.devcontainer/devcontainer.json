@@ -1,0 +1,9 @@
+{
+  "name": "ai-new-workflow-app-template-build",
+  "image": "ghcr.io/intel-agency/ai-new-workflow-app-template:main-latest",
+  "containerEnv": {
+    "DOTNET_ROOT": "/usr/share/dotnet"
+  },
+  "forwardPorts": [4096],
+  "remoteUser": "vscode"
+}

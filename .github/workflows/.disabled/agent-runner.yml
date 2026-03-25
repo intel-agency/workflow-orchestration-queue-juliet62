@@ -1,0 +1,56 @@
+name: Agent Runner
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+  issues:
+    types: [opened]
+  create: # Trigger on new branch/repo creation
+
+jobs:
+  run-agent:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write      # Allow agent to commit code
+      pull-requests: write # Allow agent to comment/approve PRs
+      issues: write        # Allow agent to comment on issues
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # 1. Prepare the Payload
+      # We dump the GitHub event context to a JSON file.
+      # This is safer than passing a massive JSON string as a CLI argument.
+      - name: Save Event Payload
+        run: |
+          echo '${{ toJson(github.event) }}' > event_payload.json
+          echo "Triggered by: ${{ github.event_name }}"
+
+      # 2. Run Agent in DevContainer
+      # uses: devcontainers/ci allows us to execute commands INSIDE the container
+      - name: Execute Agent in DevContainer
+        uses: devcontainers/ci@v0.3
+        env:
+          # Pass necessary API keys to the container
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          # Path to the folder containing .devcontainer (usually root)
+          subFolder: "."
+
+          # (Optional) Speed up builds by caching the image
+          imageName: ghcr.io/${{ github.repository }}/devcontainer
+          cacheFrom: ghcr.io/${{ github.repository }}/devcontainer
+          push: never # specific to your caching strategy
+
+          # THE COMMAND TO RUN INSIDE THE CONTAINER
+          # We pass the event name and the path to the payload file
+          runCmd: |
+            echo "Running Agent for trigger: ${{ github.event_name }}"
+
+            # Example CLI command (Adjust flags to your specific agent's syntax)
+            opencode run \
+              --trigger "${{ github.event_name }}" \
+              --payload-file event_payload.json \
+              --prompt "Act on this ${{ github.event_name }} event based on the payload data."

@@ -1,0 +1,61 @@
+name: Pre-build dev container image
+
+on:
+  workflow_run:
+    workflows: [Publish Docker]
+    types:
+      - completed
+  schedule:
+    - cron: "0 0 * * 1" # Weekly on Monday at midnight UTC
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}/devcontainer
+
+jobs:
+  prebuild:
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: read
+      packages: write
+    if: >-
+      github.event_name != 'workflow_run' ||
+      github.event.workflow_run.conclusion == 'success'
+
+    steps:
+      - name: Checkout repository
+        # trunk-ignore(yamllint/line-length)
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Resolve image tags
+        id: image-tags
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          RUN_NUMBER: ${{ github.run_number }}
+          WORKFLOW_RUN_HEAD_BRANCH: ${{ github.event.workflow_run.head_branch }}
+          WORKFLOW_RUN_RUN_NUMBER: ${{ github.event.workflow_run.run_number }}
+          VERSION_PREFIX: ${{ vars.VERSION_PREFIX }}
+        run: bash ./scripts/resolve-image-tags.sh
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.4.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pre-build dev container image
+        uses: devcontainers/ci@8bf61b26e9c3a98f69cb6ce2f88d24ff59b785c6
+        id: prebuild
+        with:
+          subFolder: .github
+          imageName: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          cacheFrom: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          imageTag: ${{ steps.image-tags.outputs.latest_tag }},${{ steps.image-tags.outputs.versioned_tag }}
+          push: always

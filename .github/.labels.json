@@ -1,0 +1,146 @@
+[
+    {
+        "name": "assigned",
+        "color": "0052cc",
+        "default": false,
+        "description": "copilot"
+    },
+    {
+        "name": "assigned:copilot",
+        "color": "ededed",
+        "default": false,
+        "description": null
+    },
+    {
+        "name": "bug",
+        "color": "d73a4a",
+        "default": true,
+        "description": "Something isn't working"
+    },
+    {
+        "name": "documentation",
+        "color": "0075ca",
+        "default": true,
+        "description": "Improvements or additions to documentation"
+    },
+    {
+        "name": "duplicate",
+        "color": "cfd3d7",
+        "default": true,
+        "description": "This issue or pull request already exists"
+    },
+    {
+        "name": "enhancement",
+        "color": "a2eeef",
+        "default": true,
+        "description": "New feature or request"
+    },
+    {
+        "name": "good first issue",
+        "color": "7057ff",
+        "default": true,
+        "description": "Good for newcomers"
+    },
+    {
+        "name": "help wanted",
+        "color": "008672",
+        "default": true,
+        "description": "Extra attention is needed"
+    },
+    {
+        "name": "invalid",
+        "color": "e4e669",
+        "default": true,
+        "description": "This doesn't seem right"
+    },
+    {
+        "name": "question",
+        "color": "d876e3",
+        "default": true,
+        "description": "Further information is requested"
+    },
+    {
+        "name": "state",
+        "color": "b17457",
+        "default": false,
+        "description": "blocked"
+    },
+    {
+        "name": "state:in-progress",
+        "color": "ededed",
+        "default": false,
+        "description": null
+    },
+    {
+        "name": "state:planning",
+        "color": "ededed",
+        "default": false,
+        "description": null
+    },
+    {
+        "name": "type:enhancement",
+        "color": "ededed",
+        "default": false,
+        "description": null
+    },
+    {
+        "name": "wontfix",
+        "color": "ffffff",
+        "default": true,
+        "description": "This will not be worked on"
+    },
+    {
+        "name": "agent:queued",
+        "color": "c5def5",
+        "default": false,
+        "description": "Issue is queued for agent processing"
+    },
+    {
+        "name": "agent:in-progress",
+        "color": "0075ca",
+        "default": false,
+        "description": "Agent is actively working on this issue"
+    },
+    {
+        "name": "agent:success",
+        "color": "2cbe4e",
+        "default": false,
+        "description": "Agent completed work successfully"
+    },
+    {
+        "name": "agent:error",
+        "color": "d93f0b",
+        "default": false,
+        "description": "Agent encountered an error"
+    },
+    {
+        "name": "agent:infra-failure",
+        "color": "b60205",
+        "default": false,
+        "description": "Agent infrastructure failure (timeout, OOM, etc.)"
+    },
+    {
+        "name": "agent:stalled-budget",
+        "color": "fbca04",
+        "default": false,
+        "description": "Agent stalled due to budget/token limits"
+    },
+    {
+        "name": "implementation:complete",
+        "color": "0e8a16",
+        "default": false,
+        "description": "Implementation phase is complete"
+    },
+    {
+        "name": "epic",
+        "color": "3e4b9e",
+        "default": false,
+        "description": "Epic-level work item"
+    },
+    {
+        "name": "story",
+        "color": "5319e7",
+        "default": false,
+        "description": "User story"
+    }
+]
